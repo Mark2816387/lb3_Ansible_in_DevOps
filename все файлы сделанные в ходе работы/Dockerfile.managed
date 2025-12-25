@@ -1,0 +1,17 @@
+FROM ubuntu:22.04
+
+RUN apt update && apt install -y openssh-server python3 sudo && rm -rf /var/lib/apt/lists/*
+
+# Создаём пользователя ansible
+RUN useradd -m ansible && echo "ansible:ansible" | chpasswd && adduser ansible sudo
+
+# SSH должен иметь рабочий каталог для демона
+RUN mkdir /var/run/sshd
+
+# Готовим директорию под SSH-ключи пользователя ansible
+RUN mkdir -p /home/ansible/.ssh && chown ansible:ansible /home/ansible/.ssh
+
+EXPOSE 22
+
+# Запуск SSH при старте контейнера
+CMD ["/usr/sbin/sshd", "-D"]
